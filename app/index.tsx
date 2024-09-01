@@ -27,7 +27,8 @@ export default function Index() {
                                 confirmAction: true,
                                 message: MAVLinkUtils.createSimpleCOMMAND_LONG(
                                     176, // MAV_CMD_DO_SET_MODE,
-                                    220 // MAV_MODE_AUTO_ARMED
+                                    1,
+                                    10
                                 )
                             },
                             {
