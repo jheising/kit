@@ -1,37 +1,50 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Drawer } from "expo-router/drawer";
+import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
+import { RedHatMono_400Regular } from "@expo-google-fonts/red-hat-mono";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import "../styles/unistyles";
+import { useStyles } from "react-native-unistyles";
+import { primitives } from "@/styles/styles";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+    const { styles } = useStyles(primitives);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    const [loaded, error] = useFonts({
+        Inter_400Regular,
+        RedHatMono_400Regular
+    });
+
+    useEffect(() => {
+        if (loaded || error) {
+            SplashScreen.hideAsync();
+        }
+    }, [loaded, error]);
+
+    if (!loaded && !error) {
+        return null;
     }
-  }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
-
-  return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
-  );
+    return <ActionSheetProvider>
+        <GestureHandlerRootView style={[{ flex: 1 }]}>
+            <Drawer>
+                <Drawer.Screen
+                    name="index" // This is the name of the page and must match the url from root
+                    options={{
+                        drawerLabel: "Home",
+                        title: "overview"
+                    }}
+                />
+                <Drawer.Screen
+                    name="vehicle/[id]" // This is the name of the page and must match the url from root
+                    options={{
+                        drawerLabel: "Vehicle",
+                        title: "Vehicle"
+                    }}
+                />
+            </Drawer>
+        </GestureHandlerRootView>
+    </ActionSheetProvider>;
 }
