@@ -20,7 +20,7 @@ const DEFAULT_CESIUM_VALUES: CesiumState = {
     hasFlownToVehicle: false
 };
 
-const MAX_TRACK_LENGTH = 25;
+const MAX_TRACK_LENGTH = 256;
 
 function getHeadingRayPositions(originPosition: any, heading: number, rayLength: number = 10) {
     heading = Cesium.Math.toRadians(heading);
@@ -82,20 +82,20 @@ async function initializeCesium(cesium: CesiumState, colors:any) {
         }
     });
 
-    cesium.viewer.entities.add({
-        id: "vehicle-cog",
-        polyline: {
-            positions: new Cesium.CallbackProperty(() => {
-                if (!cesium.currentVehiclePosition || !cesium.lastGLOBAL_POSITION_INT?.hdg) {
-                    return [];
-                }
-                return getHeadingRayPositions(cesium.currentVehiclePosition, cesium.lastGLOBAL_POSITION_INT.hdg as number);
-            }, false),
-            width: 4,
-            arcType: Cesium.ArcType.NONE,
-            material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.BLACK)
-        }
-    });
+    // cesium.viewer.entities.add({
+    //     id: "vehicle-cog",
+    //     polyline: {
+    //         positions: new Cesium.CallbackProperty(() => {
+    //             if (!cesium.currentVehiclePosition || !cesium.lastGLOBAL_POSITION_INT?.hdg) {
+    //                 return [];
+    //             }
+    //             return getHeadingRayPositions(cesium.currentVehiclePosition, cesium.lastGLOBAL_POSITION_INT.hdg as number);
+    //         }, false),
+    //         width: 4,
+    //         arcType: Cesium.ArcType.NONE,
+    //         material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.BLACK)
+    //     }
+    // });
 
     cesium.viewer.entities.add({
         id: "vehicle-track",

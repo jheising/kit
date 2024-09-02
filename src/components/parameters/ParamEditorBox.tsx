@@ -33,7 +33,7 @@ export function ParamEditorBox(props: ParamEditorBoxProps) {
     function renderContent() {
         if (props.editing) {
             return <View style={{ flexDirection: "row", gap: 5 }}>
-                <KiteNumericInput initialValue={props.initialValue} onChangeNumber={handleValueUpdated} />
+                <KiteNumericInput initialValue={props.initialValue} onChangeNumber={handleValueUpdated} autoFocus/>
                 <KiteButton iconName="check" color="success" onPress={handleSaveValue} />
                 <KiteButton iconName="close" color="danger" onPress={props.onCancel} />
             </View>;

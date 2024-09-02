@@ -65,9 +65,9 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
         props.connection.downloadAllParameters(true);
     }
 
-    async function handleSaveValue(parameterID: string, newValue: string) {
+    async function handleSaveValue(parameterID: string, newValue: number) {
         if (props.connection) {
-            await props.connection.setParameter(parameterID, Number(newValue));
+            await props.connection.setParameter(parameterID, newValue);
             setEditingParameter(undefined);
             setAvailableParameters(props.connection.getCachedParameters());
         }
@@ -90,7 +90,7 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
                        setEditingParameter(item.name);
                    }}>
                        <ParamEditorBox name={item.name}
-                                       initialValue={item.value.toString()}
+                                       initialValue={item.value as number}
                                        editing={item.name === editingParameter}
                                        onCancel={() => setEditingParameter(undefined)}
                                        onSaveValue={(newValue) => handleSaveValue(item.name, newValue)} />

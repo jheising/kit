@@ -2,6 +2,7 @@ import { KiteInput } from "@/src/components/primitives/KiteInput";
 import { useState } from "react";
 
 export function KiteNumericInput(props: {
+    autoFocus?:boolean;
     initialValue?: number | string;
     onChangeNumber?: (value:number) => void;
 }) {
@@ -18,5 +19,5 @@ export function KiteNumericInput(props: {
         }
     }
 
-    return <KiteInput value={value} onChangeText={handleChangeText} inputMode={"decimal"} />
+    return <KiteInput value={value} onChangeText={handleChangeText} inputMode={"decimal"} autoFocus={props.autoFocus} />
 }
