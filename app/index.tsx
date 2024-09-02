@@ -5,8 +5,14 @@ import { useStyles } from "react-native-unistyles";
 import { primitives } from "@/styles/styles";
 import { ActionList } from "@/src/components/actions/ActionList";
 import { MAVLinkUtils } from "@/src/MAVLink/utils/MAVLinkUtils";
+import { KiteButton } from "@/src/components/primitives/KiteButton";
+import { useState } from "react";
+import { VehicleParamEditor } from "@/src/components/parameters/VehicleParamEditor";
 
 export default function Index() {
+
+    const [showParamEditor, setShowParamEditor] = useState(false);
+
     const mavLink = useMAVLink({
         connector: {
             type: "websocket", options: {
@@ -15,10 +21,29 @@ export default function Index() {
         }
     });
 
-    const primitiveStyles = useStyles(primitives);
+    function renderParamEditor() {
+        if (!showParamEditor) {
+            return;
+        }
 
+        return <View style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: "50%"
+        }}>
+            <VehicleParamEditor connection={mavLink.connection} />
+        </View>;
+    }
+
+    function handleToggleParamEditor() {
+        setShowParamEditor(!showParamEditor);
+    }
+
+    const primitiveStyles = useStyles(primitives);
     return <View style={{ width: "100%", height: "100%", flexDirection: "row", backgroundColor: primitiveStyles.theme.colors.backgroundPrimary }}>
-        <View style={{ width: 200 }}>
+        <View style={{ width: 250 }}>
             <ActionList connection={mavLink.connection}
                         actions={[
                             {
@@ -76,9 +101,11 @@ export default function Index() {
                                 ]
                             }
                         ]} />
+                <View style={{ padding: 10 }}><KiteButton title={`${showParamEditor ? "Hide" : "Edit"} Params`} onPress={handleToggleParamEditor} /></View>
         </View>
         <View style={{ flex: 1 }}>
             <MapView connection={mavLink.connection} isGroundVehicle />
         </View>
+        {renderParamEditor()}
     </View>;
 }

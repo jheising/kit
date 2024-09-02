@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { useStyles } from "react-native-unistyles";
 import { controls } from "@/styles/styles";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { KiteInput } from "@/src/components/primitives/KiteInput";
+import { KiteButton } from "@/src/components/primitives/KiteButton";
+import { KiteText } from "@/src/components/primitives/KiteText";
 
 export interface VehicleParamEditorProps {
     connection?: MAVLinkConnectorBase;
@@ -16,14 +18,34 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
     const controlStyles = useStyles(controls);
 
     const [availableParameters, setAvailableParameters] = useState<MAVLinkParameter[]>([]);
+    const [totalParameters, setTotalParameters] = useState(0);
     const [filteredParameters, setFilteredParameters] = useState<MAVLinkParameter[]>([]);
     const [filterText, setFilterText] = useState("");
     const [editingParameter, setEditingParameter] = useState<string>();
 
     useEffect(() => {
 
-        setEditingParameter(undefined);
+        if (!props.connection) {
+            return;
+        }
 
+        function handleParameterCacheUpdated() {
+            setAvailableParameters(props.connection!.getCachedParameters());
+            setTotalParameters(props.connection!.availableParamCount);
+        }
+
+        setAvailableParameters(props.connection.getCachedParameters());
+        setTotalParameters(props.connection.availableParamCount);
+        props.connection.on("parameter-cache-updated", handleParameterCacheUpdated);
+
+        return () => {
+            if (props.connection) {
+                props.connection.off("parameter-cache-updated", handleParameterCacheUpdated);
+            }
+        };
+    }, [props.connection]);
+
+    useEffect(() => {
         if (!filterText) {
             setFilteredParameters(availableParameters);
             return;
@@ -33,8 +55,14 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
         setFilteredParameters(availableParameters.filter(parameter => parameter.name.toLowerCase().includes(searchString)));
     }, [availableParameters, filterText]);
 
-    function handleClearSearch() {
-        setFilterText("");
+    function handleDownloadParams() {
+        setEditingParameter(undefined);
+
+        if (!props.connection) {
+            return;
+        }
+
+        props.connection.downloadAllParameters(true);
     }
 
     async function handleSaveValue(parameterID: string, newValue: string) {
@@ -46,17 +74,14 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
     }
 
     return <View style={{ flex: 1, backgroundColor: controlStyles.theme.colors.backgroundSecondary }}>
-        <Button title="Refresh Params" onPress={() => {
-            if (props.connection) {
-                setAvailableParameters(props.connection.getCachedParameters());
-            }
-        }} />
-        <View>
-            <TextInput style={[controlStyles.styles.input, { margin: 20 }]} value={filterText} onChangeText={setFilterText} placeholder={"Search..."} placeholderTextColor={controlStyles.theme.colors.typographySecondary} />
-            <Pressable style={{ position: "absolute", right: 30, height: "100%", alignItems: "center", justifyContent: "center", opacity: 0.5 }} onPress={handleClearSearch}>
-                <MaterialCommunityIcons name="close-circle" size={18}
-                                        color={controlStyles.theme.colors.typographySecondary} />
-            </Pressable>
+        <View style={{ padding: 10, gap: 5 }}>
+            <KiteInput value={filterText} onChangeText={setFilterText} placeholder={"Search..."} placeholderTextColor={controlStyles.theme.colors.typographySecondary} showClearButton />
+            <View style={{ gap: 5, flexDirection: "row", alignItems: "center" }}>
+                <View style={{paddingLeft:10}}><KiteText>Loaded {availableParameters.length} of {totalParameters}</KiteText></View>
+                <View style={{ flex: 1, justifyContent: "center", alignItems: "flex-end" }}>
+                    <KiteButton title="Download Params" color="success" onPress={handleDownloadParams} />
+                </View>
+            </View>
         </View>
         {/*{availableParameters.map(parameter => <ParamEditorBox key={parameter.name} name={parameter.name} />)}*/}
         <FlashList style={{ width: "100%", height: "100%" }}
@@ -65,7 +90,7 @@ export function VehicleParamEditor(props: VehicleParamEditorProps) {
                        setEditingParameter(item.name);
                    }}>
                        <ParamEditorBox name={item.name}
-                                       value={item.value.toString()}
+                                       initialValue={item.value.toString()}
                                        editing={item.name === editingParameter}
                                        onCancel={() => setEditingParameter(undefined)}
                                        onSaveValue={(newValue) => handleSaveValue(item.name, newValue)} />

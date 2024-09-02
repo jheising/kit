@@ -2,50 +2,44 @@ import { Button, Pressable, Text, TextInput, View } from "react-native";
 import { createStyleSheet, useStyles } from "react-native-unistyles";
 import { controls, primitives } from "@/styles/styles";
 import { ListBox } from "@/src/components/primitives/ListBox";
-import React, { useEffect, useState } from "react";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useEffect, useRef, useState } from "react";
+import { KiteButton } from "@/src/components/primitives/KiteButton";
+import { KiteNumericInput } from "@/src/components/primitives/KiteNumericInput";
 
 
 export interface ParamEditorBoxProps {
     name: string;
-    value: string;
+    initialValue: number;
     editing?: boolean;
-    onSaveValue?: (value: string) => void;
+    onSaveValue?: (value: number) => void;
     onCancel?: () => void;
 }
 
 export function ParamEditorBox(props: ParamEditorBoxProps) {
     const primitive = useStyles(primitives);
     const component = useStyles(stylesheet);
-    const controlStyles = useStyles(controls);
-    const [editingValue, setEditingValue] = useState<string>("");
+    const currentValue = useRef(props.initialValue);
 
-    useEffect(() => {
-        if (props.editing) {
-            setEditingValue(props.value ?? "");
-        }
-    }, [props.editing]);
+    function handleValueUpdated(value: number) {
+        currentValue.current = value;
+    }
 
     function handleSaveValue() {
         if (props.onSaveValue) {
-            props.onSaveValue(editingValue);
+            props.onSaveValue(currentValue.current);
         }
     }
 
     function renderContent() {
         if (props.editing) {
             return <View style={{ flexDirection: "row", gap: 5 }}>
-                <TextInput style={[controlStyles.styles.input, primitive.styles.fontMono, {flex:1}]} value={editingValue} onChangeText={setEditingValue} inputMode="numeric" onSubmitEditing={handleSaveValue} autoFocus />
-                <Pressable style={{ width: 40, alignItems: "center", justifyContent: "center", backgroundColor: component.theme.colors.success, borderRadius: 5 }} onPress={handleSaveValue}>
-                    <MaterialCommunityIcons name="check" size={24} color={component.theme.colors.backgroundSecondary} />
-                </Pressable>
-                <Pressable style={{ width: 40, alignItems: "center", justifyContent: "center", backgroundColor: component.theme.colors.danger, borderRadius: 5 }} onPress={props.onCancel}>
-                    <MaterialCommunityIcons name="close" size={24} color={component.theme.colors.backgroundSecondary} />
-                </Pressable>
+                <KiteNumericInput initialValue={props.initialValue} onChangeNumber={handleValueUpdated} />
+                <KiteButton iconName="check" color="success" onPress={handleSaveValue} />
+                <KiteButton iconName="close" color="danger" onPress={props.onCancel} />
             </View>;
         }
 
-        return <Text style={[primitive.styles.text, primitive.styles.fontMono, { fontSize: 20 }]}>{props.value}</Text>;
+        return <Text style={[primitive.styles.text, primitive.styles.fontMono, { fontSize: 20 }]}>{props.initialValue}</Text>;
     }
 
     return <ListBox style={component.styles.container}>

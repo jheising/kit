@@ -11,18 +11,29 @@
 //     }
 // } as const;
 
+const GREEN = "#51C776";
+const RED = "#c75151";
+const BLUE = "#5184c7";
+const PURPLE = "#8e51c7";
+const ORANGE = "#c77e51";
+
 export const darkTheme = {
     colors: {
         typography: "#ffffff",
         typographySecondary: "#89898E",
         backgroundPrimary: "#19191D",
         backgroundSecondary: "#27272E",
-        success: "#51C776",
-        danger: "#c75151"
+        green: GREEN,
+        red: RED,
+        blue: BLUE,
+        purple: PURPLE,
+        orange: ORANGE,
+        success: GREEN,
+        danger: RED
     },
     typography: {
         font: {
-            regular: "Inter_400Regular",
+            regular: "Poppins_400Regular",
             mono: "RedHatMono_400Regular"
         }
     },

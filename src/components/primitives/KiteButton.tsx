@@ -30,7 +30,7 @@ export function KiteButton(props: PropsWithChildren<{
 
         return <React.Fragment>
             {props.iconName && <MaterialCommunityIcons name={props.iconName as any} size={24} color={fontColor} />}
-            {props.title && <Text style={[primitiveStyles.styles.text, { color: fontColor, flex: 1, textAlign: "center" }]}>{props.title}</Text>}
+            {props.title && <Text style={[primitiveStyles.styles.text, { color: fontColor, flex: 1, textAlign: props.iconName ? undefined : "center" }]}>{props.title}</Text>}
         </React.Fragment>;
     }
 

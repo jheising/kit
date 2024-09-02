@@ -1,19 +1,15 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
-import { Inter_400Regular, useFonts } from "@expo-google-fonts/inter";
+import { Poppins_400Regular, useFonts } from "@expo-google-fonts/poppins";
 import { RedHatMono_400Regular } from "@expo-google-fonts/red-hat-mono";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "../styles/unistyles";
-import { useStyles } from "react-native-unistyles";
-import { primitives } from "@/styles/styles";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 export default function RootLayout() {
-    const { styles } = useStyles(primitives);
-
     const [loaded, error] = useFonts({
-        Inter_400Regular,
+        Poppins_400Regular,
         RedHatMono_400Regular
     });
 

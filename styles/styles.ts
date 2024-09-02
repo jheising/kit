@@ -39,7 +39,7 @@ export const controls = createStyleSheet(theme => ({
         fontFamily: theme.typography.font.regular,
         backgroundColor: theme.colors.backgroundPrimary,
         borderRadius: theme.corners,
-        borderWidth: 2,
+        // borderWidth: 2,
         borderColor: theme.colors.backgroundSecondary,
         height: theme.controlHeight
     },

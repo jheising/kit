@@ -24,7 +24,7 @@ export abstract class MAVLinkConnectorBase extends EventEmitter {
     private _paramCacheByID: { [paramID: string]: MAVLinkMessage } = {};
     private _paramCacheByIndex: { [paramIndex: number]: MAVLinkMessage } = {};
     private _missionCache: MAVLinkMessage[] = [];
-    private _availableParamCount: number = -1;
+    private _availableParamCount: number = 0;
 
     connect() {
         // Cache any PARAM_VALUE messages that come across the wire
@@ -45,6 +45,10 @@ export abstract class MAVLinkConnectorBase extends EventEmitter {
 
     get connectionState(): MAVLinkConnectionState {
         return this._connectionState;
+    }
+
+    get availableParamCount(): number {
+        return this._availableParamCount;
     }
 
     getCachedParameters(): MAVLinkParameter[] {
@@ -82,6 +86,25 @@ export abstract class MAVLinkConnectorBase extends EventEmitter {
         }
     }
 
+    resetParameterCache() {
+        this._paramCacheByID = {};
+        this._paramCacheByIndex = {};
+        this._availableParamCount = 0;
+        this.emit("parameter-cache-updated");
+    }
+
+    downloadAllParameters(resetCache: boolean = true) {
+        if (resetCache) {
+            this.resetParameterCache();
+        }
+
+        this.sendMAVLinkMessage({
+            mavpackettype: "PARAM_REQUEST_LIST",
+            target_system: 1,
+            target_component: 1
+        });
+    }
+
     async setParameter(parameterID: string, value: number) {
         // Get the parameter type first. TODO: this might not be needed
         const existingParameter = await this._getParameter(parameterID);
@@ -113,7 +136,8 @@ export abstract class MAVLinkConnectorBase extends EventEmitter {
         if (parameterMessage.mavpackettype === "PARAM_VALUE") {
             this._paramCacheByIndex[parameterMessage.param_index as number] = parameterMessage;
             this._paramCacheByID[parameterMessage.param_id] = parameterMessage;
-            this._availableParamCount = parameterMessage.param_count as number ?? -1;
+            this._availableParamCount = parameterMessage.param_count as number ?? 0;
+            this.emit("parameter-cache-updated");
         }
     }
 
